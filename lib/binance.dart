@@ -14,9 +14,13 @@ library binance;
 
 export 'data/rest_classes.dart';
 export 'data/ws_classes.dart';
+export 'data/fapi_classes.dart';
 export 'data/enums.dart';
+
+import 'package:binance/src/fapiRest.dart';
+import 'package:binance/src/websocketFutureAPI.dart';
 
 import 'src/websocket.dart';
 import 'src/rest.dart';
 
-class Binance with BinanceWebsocket, BinanceRest {}
+class Binance with BinanceWebsocket, fapiRest, BinanceFAPIWebsocket, BinanceRest {}

@@ -1,7 +1,7 @@
 name: binance
-description: A wrapper for Binance API with serialized data classes, futures, and streams.
-version: 1.0.1
-author: Luke Pighetti<lukepighetti@gmail.com>
+description: A wrapper for Binance API with serialized data classes, futures, and streams. Added Future API.
+version: 1.0.2
+author: Luke Pighetti<lukepighetti@gmail.com>, Tom M. Mayer <tomymayer@googlemail.com>
 homepage: http://github.com/lukepighetti/binance-dart
 
 environment:
