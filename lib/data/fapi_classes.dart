@@ -19,11 +19,12 @@ class Book {
   Map<num, num> ask = SplayTreeMap();
 
   Book init(Map m) {
-    initiliazed = true;
     this.lastUpdateId = m["lastUpdateId"];
 
     _mapSide(m["bids"], bid);
     _mapSide(m["asks"], ask);
+
+    initiliazed = true;
 
     return this;
   }
@@ -33,6 +34,7 @@ class Book {
       var b = input[i];
       var q = num.parse(b[1]);
       var p = num.parse(b[0]);
+
       if (q == 0)
         target.remove(p);
       else

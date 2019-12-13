@@ -22,8 +22,18 @@ class BinanceFAPIWebsocket {
       [int levels = 5]) {
     assert(levels == 5 || levels == 10 || levels == 20);
 
-    final channel = _public('${symbol.toLowerCase()}@depth$levels@100ms');
+    // final channel = _public('${symbol.toLowerCase()}@depth$levels@100ms');
+    final channel = _public('${symbol.toLowerCase()}@depth@100ms');
 
     return channel.stream.map((_toMap)).map<Book>((m) => runningBook.update(m));
+  }
+
+
+  Stream fapiTrades(String symbol) {
+
+    final channel = _public('${symbol.toLowerCase()}@aggTrade');
+
+    return channel.stream;
+
   }
 }

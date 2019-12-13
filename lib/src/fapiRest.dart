@@ -14,7 +14,7 @@ class fapiRest {
 
   /// Order book depth from /v1/depth
   ///
-  Future<Book> fapiBook(String symbol, Book runningBook, [int limit = 100]) =>
+  Future<Book> fapiBook(String symbol, Book runningBook, [int limit = 1000]) =>
       _public('/fapi/v1/depth', {'symbol': '$symbol', 'limit': '$limit'})
           .then((r) => runningBook.init(r));
 
