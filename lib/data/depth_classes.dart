@@ -8,7 +8,16 @@ import 'dart:collection';
 class Book {
   int lastUpdateId;
 
+  /**
+   * Indicates if complete book was already fetched by REST API
+   */
   bool initiliazed = false;
+
+  /**
+   * Indicates if book is initalizing by REST API
+   */
+  bool isInitializing = false;
+
   bool bufferUpdates = true;
   List<Map> buffer = List();
 
@@ -25,6 +34,7 @@ class Book {
     _mapSide(m["asks"], ask);
 
     initiliazed = true;
+    isInitializing = false;
 
     return this;
   }
@@ -68,7 +78,10 @@ class Book {
         merge();
       }
 
-      assert(input["pu"] == uLast, "Synchronization issue.");
+      if (input["pu"] != null)
+        assert(input["pu"] == uLast, "Synchronization issue.");
+      else
+        assert(input["U"] == uLast+1, "Synchronization issue.");
 
       _mapSide(input["b"], bid);
       _mapSide(input["a"], ask);

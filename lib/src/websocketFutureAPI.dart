@@ -1,4 +1,4 @@
-import 'package:binance/data/fapi_classes.dart';
+import 'package:binance/data/depth_classes.dart';
 import 'package:binance/data/rest_classes.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert' as convert;

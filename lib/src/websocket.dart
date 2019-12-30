@@ -1,15 +1,18 @@
 import 'dart:convert' as convert;
+import 'package:binance/data/depth_classes.dart';
 import 'package:web_socket_channel/io.dart';
 
 import '../data/ws_classes.dart';
 
 class BinanceWebsocket {
-  IOWebSocketChannel _public(String channel) => IOWebSocketChannel.connect(
+  IOWebSocketChannel _public(String channel) =>
+      IOWebSocketChannel.connect(
         'wss://stream.binance.com:9443/ws/${channel}',
         pingInterval: Duration(minutes: 1),
       );
 
   Map _toMap(json) => convert.jsonDecode(json);
+
   List<Map> _toList(json) => List<Map>.from(convert.jsonDecode(json));
 
   /// Reports aggregated trade events from <symbol>@aggTrade
@@ -22,6 +25,15 @@ class BinanceWebsocket {
         .map<Map>(_toMap)
         .map<WsAggregatedTrade>((e) => WsAggregatedTrade.fromMap(e));
   }
+
+  /// Aggrated Trades with low-latency (no mapping)
+  ///
+  ///
+  Stream sapiTrades(String symbol) {
+    final channel = _public('${symbol.toLowerCase()}@aggTrade');
+    return channel.stream;
+  }
+
 
   /// Reports 24hr miniTicker events every second from <symbol>@miniTicker
   ///
@@ -42,7 +54,7 @@ class BinanceWebsocket {
     final channel = _public('!miniTicker@arr');
 
     return channel.stream.map<List<Map>>(_toList).map<List<MiniTicker>>(
-        (ev) => ev.map((m) => MiniTicker.fromMap(m)).toList());
+            (ev) => ev.map((m) => MiniTicker.fromMap(m)).toList());
   }
 
   /// Reports 24hr ticker events every second from <symbol>@ticker
@@ -81,6 +93,13 @@ class BinanceWebsocket {
     return channel.stream
         .map<Map>(_toMap)
         .map<BookDepth>((m) => BookDepth.fromMap(m));
+  }
+
+  Stream<Book> sapiBookDepth(String symbol, Book runningBook) {
+
+    final channel = _public('${symbol.toLowerCase()}@depth@100ms');
+
+    return channel.stream.map((_toMap)).map<Book>((m) => runningBook.update(m));
   }
 
   /// Difference book depth
