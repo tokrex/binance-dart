@@ -102,6 +102,13 @@ class BinanceWebsocket {
     return channel.stream.map((_toMap)).map<Book>((m) => runningBook.update(m));
   }
 
+  Stream sapiBookStream(String symbol) {
+
+    final channel = _public('${symbol.toLowerCase()}@depth@100ms');
+
+    return channel.stream;
+  }
+
   /// Difference book depth
   ///
   /// This can be used to update an existing book with incremental changes

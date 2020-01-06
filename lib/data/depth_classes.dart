@@ -6,6 +6,11 @@ import 'dart:collection';
 /// https://binance-docs.github.io/apidocs/futures/en/#how-to-manage-a-local-order-book-correctly
 ///
 class Book {
+  /**
+   * Timestamp, internally used to store book
+   */
+  num time;
+
   int lastUpdateId;
 
   /**
@@ -39,11 +44,18 @@ class Book {
     return this;
   }
 
+  num getAsNum(v) {
+    if (v is String)
+      return num.parse(v).truncate();
+    else
+      return v;
+  }
+
   _mapSide(List input, Map target) {
     for (var i = 0; i < input.length; i++) {
       var b = input[i];
-      var q = num.parse(b[1]);
-      var p = num.parse(b[0]);
+      var q = getAsNum(b[1]);
+      var p = getAsNum(b[0]);
 
       if (q == 0)
         target.remove(p);
@@ -52,8 +64,23 @@ class Book {
     }
   }
 
+  Function onBookReady;
+
   Book update(Map input) {
     if (bufferUpdates) {
+      /**
+       * Check whether the last real-time data is directly connected to the fetched orderbook
+       */
+      if (lastUpdateId != null) {
+        bufferUpdates = !(input["U"] == lastUpdateId + 1);
+        if (!bufferUpdates && onBookReady != null) onBookReady();
+      }
+    }
+
+    if (bufferUpdates) {
+      /**
+       * Cache real-time updates until up-to-date with fetched orderbook
+       */
       if (lastUpdateId != null) {
         // Drop any event where u is < lastUpdateId in the snapshot.
         if (input["u"] < lastUpdateId) return this;
@@ -68,20 +95,20 @@ class Book {
           bufferUpdates = false;
           mergeUpdate = true;
         }
-      } else
-        print("book not initialized.");
+      }
     } else {
       if (mergeUpdate) {
         print("merge..");
         //..first merge, before map latest event
         mergeUpdate = false;
         merge();
+        if (onBookReady != null) onBookReady();
       }
 
       if (input["pu"] != null)
         assert(input["pu"] == uLast, "Synchronization issue.");
       else
-        assert(input["U"] == uLast+1, "Synchronization issue.");
+        assert(input["U"] == uLast + 1, "Synchronization issue.");
 
       _mapSide(input["b"], bid);
       _mapSide(input["a"], ask);

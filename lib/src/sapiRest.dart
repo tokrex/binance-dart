@@ -7,7 +7,7 @@ class sapiRest {
     final uri = Uri.https('api.binance.com', '$path', params);
     final response = await http.get(uri);
 
-    return convert.jsonDecode(response.body);
+    return response.body; // convert.jsonDecode(response.body);
   }
 
   /// Order book depth from /v1/depth
@@ -15,4 +15,11 @@ class sapiRest {
   Future<Book> sapiBook(String symbol, Book runningBook, [int limit = 1000]) =>
       _public('/api/v1/depth', {'symbol': '$symbol', 'limit': '$limit'})
           .then((r) => runningBook.init(r));
+
+
+  Future sapiBookRaw(String symbol, [int limit = 1000]) {
+    return _public('/api/v1/depth', {'symbol': '$symbol', 'limit': '$limit'});
+  }
+
+
 }

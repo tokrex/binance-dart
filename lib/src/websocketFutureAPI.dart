@@ -4,7 +4,8 @@ import 'package:web_socket_channel/io.dart';
 import 'dart:convert' as convert;
 
 class BinanceFAPIWebsocket {
-  IOWebSocketChannel _public(String channel) => IOWebSocketChannel.connect(
+  IOWebSocketChannel _public(String channel) =>
+      IOWebSocketChannel.connect(
         'wss://fstream.binance.com/ws/${channel}',
         pingInterval: Duration(minutes: 1),
       );
@@ -29,11 +30,16 @@ class BinanceFAPIWebsocket {
   }
 
 
-  Stream fapiTrades(String symbol) {
+  Stream fapiBookStream(String symbol) {
+    final channel = _public('${symbol.toLowerCase()}@depth@100ms');
 
+    return channel.stream;
+  }
+
+
+  Stream fapiTrades(String symbol) {
     final channel = _public('${symbol.toLowerCase()}@aggTrade');
 
     return channel.stream;
-
   }
 }
